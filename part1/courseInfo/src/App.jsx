@@ -2,7 +2,8 @@ import Header from "./components/Header";
 import Content from "./components/Content";
 import Total from "./components/Total";
 function App() {
-  const contents = [
+  const course = "Half Stack application development";
+  const parts = [
     {
       name: "Fundamentals of React",
       exercises: 10,
@@ -18,11 +19,9 @@ function App() {
   ];
   return (
     <>
-      <Header />
-      <Content contents={contents} />
-      <Total
-        total={contents.reduce((sum, content) => sum + content.exercises, 0)}
-      />
+      <Header course={course} />
+      <Content parts={parts} />
+      <Total parts={parts} />
     </>
   );
 }

@@ -1,7 +1,7 @@
-function Header() {
+function Header(props) {
   return (
     <header>
-      <h1>Full Stack Open</h1>
+      <h1>{props.course}</h1>
     </header>
   );
 }
