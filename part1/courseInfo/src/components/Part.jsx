@@ -1,8 +1,8 @@
-function Part(props) {
+function Part({ exerciseContent }) {
   return (
     <div>
       <p>
-        {props.content.name} {props.content.exercises}
+        {exerciseContent.name} {exerciseContent.exercises}
       </p>
     </div>
   );

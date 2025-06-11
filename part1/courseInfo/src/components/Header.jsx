@@ -1,7 +1,7 @@
-function Header(props) {
+function Header({ courseName }) {
   return (
     <header>
-      <h1>{props.course}</h1>
+      <h1>{courseName}</h1>
     </header>
   );
 }

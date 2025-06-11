@@ -23,7 +23,8 @@ const App = () => {
   };
 
   // 这个需要稍微琢磨一下，有点tricky
-  // 每次投票后，更新votes数组和maxVotes数组
+  // 每次投票后，更新votes数组和maxVotes数
+
   const handleVote = () => {
     const newVotes = [...votes];
     newVotes[selected] += 1;

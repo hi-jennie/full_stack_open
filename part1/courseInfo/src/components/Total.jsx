@@ -1,4 +1,12 @@
 function Total(props) {
-  return <p>{props.parts.reduce((sum, part) => sum + part.exercises, 0)}</p>;
+  const totalExercises = props.parts.reduce(
+    (sum, part) => sum + part.exercises,
+    0
+  );
+  return (
+    <p>
+      <strong>Total of {totalExercises} exercises</strong>
+    </p>
+  );
 }
 export default Total;

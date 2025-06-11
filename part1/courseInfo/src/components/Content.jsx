@@ -1,9 +1,9 @@
 import Part from "./Part.jsx";
-function Content(props) {
+function Content({ parts }) {
   return (
     <>
-      {props.parts.map((content, index) => (
-        <Part key={index} content={content} />
+      {parts.map((exerciseContent, index) => (
+        <Part key={index} exerciseContent={exerciseContent} />
       ))}
     </>
   );
