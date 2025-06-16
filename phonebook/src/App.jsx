@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Filter from "./components/Filter.jsx";
 import PersonForm from "./components/PersonForm.jsx";
 import Persons from "./components/Persons.jsx";
-import axios from "axios";
+import phonebookService from "./services/phonebookService.js";
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
@@ -16,24 +16,75 @@ const App = () => {
     event.preventDefault();
     const newPerson = {
       name: newName,
-      number: newNumber,
-      id: persons.length + 1, // Simple ID generation
+      number: newNumber, // Simple ID generation
     };
-    if (persons.some((person) => person.name === newName)) {
-      alert(`${newName} is already added to phonebook`);
+    const existPerson = persons.find(
+      (person) => person.name.toLowerCase() === newName.toLowerCase()
+    );
+    if (existPerson) {
+      const confirmReplacement = window.confirm(
+        `${newName} is already added to phonebook`
+      );
+      if (confirmReplacement) {
+        phonebookService
+          .updatePerson(existPerson.id, newPerson)
+          .then((returnedData) => {
+            setPersons(
+              persons.map((person) =>
+                person.id !== existPerson.id ? person : returnedData
+              )
+            );
+            console.log("updated person", returnedData);
+            setNewName("");
+            setNewNumber("");
+          })
+          .catch((error) => {
+            console.error("Error updating person:", error);
+            alert("Error updating person. Please try again.");
+          });
+      }
+      console.log(confirmReplacement);
     } else {
-      setPersons(persons.concat(newPerson));
-      setNewName("");
-      setNewNumber("");
+      phonebookService
+        .createPerson(newPerson)
+        .then((returnedData) => {
+          setPersons(persons.concat(returnedData));
+          console.log("added person", returnedData);
+          setNewName("");
+          setNewNumber("");
+        })
+        .catch((error) => {
+          console.error("Error adding person:", error);
+          alert("Error adding person. Please try again.");
+        });
+    }
+  };
+
+  const handleDelete = (id) => {
+    const personToDelete = persons.find((person) => person.id === id);
+    const confirmDeletion = window.confirm(
+      `are you sure you want to delete ${personToDelete.name}?`
+    );
+    if (confirmDeletion) {
+      phonebookService
+        .deletePerson(id)
+        .then((returnedData) => {
+          setPersons(persons.filter((person) => person.id !== id));
+          console.log("deleted person", returnedData);
+        })
+        .catch((error) => {
+          console.error("Error deleting person:", error);
+          alert("Error deleting person. Please try again.");
+        });
     }
   };
 
   useEffect(() => {
     // Fetch initial data from the server
-    axios
-      .get("http://localhost:3001/persons")
-      .then((response) => {
-        setPersons(response.data);
+    phonebookService
+      .getAll()
+      .then((initialData) => {
+        setPersons(initialData);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
@@ -55,7 +106,7 @@ const App = () => {
       />
 
       <h2>Numbers</h2>
-      <Persons personsToShow={personsToShow} />
+      <Persons personsToShow={personsToShow} handleDelete={handleDelete} />
     </div>
   );
 };

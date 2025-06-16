@@ -1,4 +1,4 @@
-function Persons({ personsToShow }) {
+function Persons({ personsToShow, handleDelete }) {
   return (
     <ol>
       {personsToShow.map((person, index) => (
@@ -6,6 +6,7 @@ function Persons({ personsToShow }) {
           <strong>
             {person.name} {person.number}
           </strong>
+          <button onClick={() => handleDelete(person.id)}>delete</button>
         </li>
       ))}
     </ol>
