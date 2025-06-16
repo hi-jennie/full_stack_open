@@ -3,11 +3,13 @@ import Filter from "./components/Filter.jsx";
 import PersonForm from "./components/PersonForm.jsx";
 import Persons from "./components/Persons.jsx";
 import phonebookService from "./services/phonebookService.js";
+import Notification from "./components/Notification.jsx";
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filter, setFilter] = useState("");
+  const [message, setMessage] = useState(null);
   const personsToShow = persons.filter((person) =>
     person.name.toLowerCase().includes(filter.toLowerCase())
   );
@@ -34,13 +36,26 @@ const App = () => {
                 person.id !== existPerson.id ? person : returnedData
               )
             );
+            setMessage({
+              type: "success",
+              content: `Updated ${returnedData.name}'s number`,
+            });
+            setTimeout(() => {
+              setMessage(null);
+            }, 5000);
             console.log("updated person", returnedData);
             setNewName("");
             setNewNumber("");
           })
           .catch((error) => {
             console.error("Error updating person:", error);
-            alert("Error updating person. Please try again.");
+            setMessage({
+              type: "error",
+              content: "Error updating person. Please try again.",
+            });
+            setTimeout(() => {
+              setMessage(null);
+            }, 5000);
           });
       }
       console.log(confirmReplacement);
@@ -49,13 +64,26 @@ const App = () => {
         .createPerson(newPerson)
         .then((returnedData) => {
           setPersons(persons.concat(returnedData));
+          setMessage({
+            type: "success",
+            content: `Added ${returnedData.name}`,
+          });
+          setTimeout(() => {
+            setMessage(null);
+          }, 5000);
           console.log("added person", returnedData);
           setNewName("");
           setNewNumber("");
         })
         .catch((error) => {
           console.error("Error adding person:", error);
-          alert("Error adding person. Please try again.");
+          setMessage({
+            type: "error",
+            content: "Error adding person. Please try again.",
+          });
+          setTimeout(() => {
+            setMessage(null);
+          }, 5000);
         });
     }
   };
@@ -70,11 +98,24 @@ const App = () => {
         .deletePerson(id)
         .then((returnedData) => {
           setPersons(persons.filter((person) => person.id !== id));
+          setMessage({
+            type: "success",
+            content: `Deleted ${personToDelete.name}`,
+          });
+          setTimeout(() => {
+            setMessage(null);
+          }, 5000);
           console.log("deleted person", returnedData);
         })
         .catch((error) => {
           console.error("Error deleting person:", error);
-          alert("Error deleting person. Please try again.");
+          setMessage({
+            type: "error",
+            content: `Error deleting ${personToDelete.name}. It may have already been removed.`,
+          });
+          setTimeout(() => {
+            setMessage(null);
+          }, 5000);
         });
     }
   };
@@ -94,6 +135,7 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
+      <Notification message={message}></Notification>
       <Filter filter={filter} setFilter={setFilter} />
 
       <h2>Add a New</h2>
