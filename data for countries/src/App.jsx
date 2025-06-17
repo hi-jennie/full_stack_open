@@ -32,7 +32,7 @@ function App() {
   return (
     <div>
       <Filter searchTerm={searchTerm} setSearchTerm={setSearchTerm}></Filter>
-      <Countries countriesToShow={countriesToShow}></Countries>
+      <Countries countries={countriesToShow}></Countries>
     </div>
   );
 }

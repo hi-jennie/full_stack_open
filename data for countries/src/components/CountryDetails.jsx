@@ -1,3 +1,4 @@
+import Weather from "./Weather";
 function CountryDetails({ country }) {
   if (!country) {
     return <div>Loading...</div>;
@@ -16,6 +17,7 @@ function CountryDetails({ country }) {
         ))}
       </ul>
       <img src={country.flags["png"]} alt={country.flags["alt"]}></img>
+      <Weather country={country} />
     </div>
   );
 }
