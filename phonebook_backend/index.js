@@ -1,7 +1,15 @@
 
 const express = require('express');
+const morgan = require('morgan')
 const app = express();
 app.use(express.json())
+
+// define a token called body, the return value of the callback function will be assigned to the body token
+morgan.token('body', (request) => {
+    return request.method === 'POST' ? JSON.stringify(request.body) : ""
+})
+// the  parameter in morgan defines the format of the log
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 let persons = [
     {
