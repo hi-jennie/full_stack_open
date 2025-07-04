@@ -1,8 +1,10 @@
-
+require('dotenv').config()
 const express = require('express');
+const cors = require('cors')
 const morgan = require('morgan')
 const app = express();
 app.use(express.json())
+app.use(cors())
 
 // define a token called body, the return value of the callback function will be assigned to the body token
 morgan.token('body', (request) => {
@@ -96,7 +98,7 @@ app.post('/api/persons', (request, response) => {
     response.json(newPerson)
 })
 
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 
