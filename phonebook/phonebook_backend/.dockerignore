@@ -1,0 +1,27 @@
+# flyctl launch added from phonebook_backend/.gitignore
+phonebook_backend/**/node_modules
+
+# flyctl launch added from phonebook_frontedend/.gitignore
+# Logs
+phonebook_frontedend/**/logs
+phonebook_frontedend/**/*.log
+phonebook_frontedend/**/npm-debug.log*
+phonebook_frontedend/**/yarn-debug.log*
+phonebook_frontedend/**/yarn-error.log*
+phonebook_frontedend/**/pnpm-debug.log*
+phonebook_frontedend/**/lerna-debug.log*
+
+phonebook_frontedend/**/node_modules
+phonebook_frontedend/**/*.local
+
+# Editor directories and files
+phonebook_frontedend/**/.vscode/*
+!phonebook_frontedend/**/.vscode/extensions.json
+phonebook_frontedend/**/.idea
+phonebook_frontedend/**/.DS_Store
+phonebook_frontedend/**/*.suo
+phonebook_frontedend/**/*.ntvs*
+phonebook_frontedend/**/*.njsproj
+phonebook_frontedend/**/*.sln
+phonebook_frontedend/**/*.sw?
+fly.toml

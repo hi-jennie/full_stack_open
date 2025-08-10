@@ -1,5 +1,6 @@
 import axios from 'axios'
-const baseUrl = 'http://localhost:3001/persons'
+// 如果一dist文件夹和后段在一起，那么要用相对路径
+const baseUrl = '/api/persons'
 const getAll = () => {
     return axios.get(baseUrl).then(response => response.data)
 }
