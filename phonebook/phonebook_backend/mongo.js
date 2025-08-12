@@ -7,7 +7,7 @@ if (process.argv.length < 3) {
 
 const password = process.argv[2]
 
-const url = `mongodb+srv://jenniewang2024:${password}@cluster0.4bjnssi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
+const url = `mongodb+srv://jenniewang2024:${password}@cluster0.4bjnssi.mongodb.net/phonebookApp?retryWrites=true&w=majority&appName=Cluster0`
 
 mongoose.set('strictQuery', false)
 
@@ -27,13 +27,25 @@ const personSchema = new mongoose.Schema({
 const Person = mongoose.model('person', personSchema)
 
 // 创建实例
-const person = new Person({
-    name: "Arto Hellas",
-    number: "040-123456"
-})
+if (process.argv[3] && process.argv[4]) {
+    const person = new Person({
+        name: process.argv[3],
+        number: process.argv[4]
+    })
+    // save 实例到数据库
+    person.save().then(result => {
+        console.log(`added ${result.name} number ${result.number} to phonebook`)
+        mongoose.connection.close()
+    })
+} else {
+    Person.find({}).then(result => {
+        result.forEach(person => {
+            console.log(`${person.name} ${person.number}`)
+        })
+        mongoose.connection.close()
+    })
+}
 
-// save 实例到数据库
-person.save().then(result => {
-    console.log('person saved!')
-    mongoose.connection.close()
-})
+
+
+
