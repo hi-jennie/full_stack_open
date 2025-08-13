@@ -2,7 +2,7 @@
 DELETE http://localhost:3001/api/persons/3
 
 ###
-GET  https://phonebook-backend-withered-wind-935.fly.dev/api/persons
+GET  http://localhost:3001/api/persons
 
 ###
 POST http://localhost:3001/api/persons HTTP/1.1

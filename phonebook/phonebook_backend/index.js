@@ -7,34 +7,7 @@ const app = express();
 app.use(express.json())
 app.use(cors())
 app.use(express.static('dist'))
-const mongoose = require('mongoose')
-
-if (process.argv.length < 3) {
-    console.log('give password as argument')
-    process.exit(1)
-}
-const password = process.argv[2]
-
-const url = `mongodb+srv://jenniewang2024:${password}@cluster0.4bjnssi.mongodb.net/phonebookApp?retryWrites=true&w=majority&appName=Cluster0`
-
-mongoose.set('strictQuery', false)
-
-
-const personSchema = new mongoose.Schema({
-    name: String,
-    number: String
-})
-const Person = mongoose.model('person', personSchema)
-
-personSchema.set('toJSON', {
-    transform: (document, returnedObject) => {
-        // 把 _id 改成 id（字符串）
-        returnedObject.id = returnedObject._id.toString()
-        // 删除 _id 和 __v
-        delete returnedObject._id
-        delete returnedObject.__v
-    }
-})
+const Person = require('./models/person') // 引入模型
 
 // define a token called body, the return value of the callback function will be assigned to the body token
 morgan.token('body', (request) => {
@@ -51,16 +24,12 @@ app.get('/api/persons', (request, response) => {
     })
 })
 
-// //  get single person through id
-// app.get('/api/persons/:id', (request, response) => {
-//     const id = Number(request.params.id);
-//     const targetPerson = persons.find(p => Number(p.id) === id)
-//     if (targetPerson) {
-//         response.json(targetPerson);
-//     } else {
-//         response.status(404).end();
-//     }
-// })
+//  get single person through id
+app.get('/api/persons/:id', (request, response) => {
+    Person.findById(request.params.id).then(person => {
+        response.json(person)
+    })
+})
 
 // // delete person through id
 // app.delete('/api/persons/:id', (request, response) => {
@@ -117,15 +86,10 @@ app.post('/api/persons', (request, response) => {
     })
 })
 
+const PORT = process.env.PORT || 3001
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+})
 
-mongoose.connect(url)
-    .then(() => {
-        const PORT = process.env.PORT || 3001
-        app.listen(PORT, () => {
-            console.log(`Server running on port ${PORT}`);
-        })
-    })
-    .catch(err => {
-        console.error('error connecting to MongoDB:', err.message)
-    })
+
 
