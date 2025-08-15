@@ -31,17 +31,17 @@ app.get('/api/persons/:id', (request, response) => {
     })
 })
 
-// // delete person through id
-// app.delete('/api/persons/:id', (request, response) => {
-//     const id = request.params.id;
-//     const deletedPerson = persons.find(p => p.id === id)
-//     if (deletedPerson) {
-//         persons = persons.filter(p => p.id !== id)
-//         response.status(204).end()
-//     } else {
-//         response.status(404).end()
-//     }
-// })
+// delete person through id
+app.delete('/api/persons/:id', (request, response, next) => {
+    const id = request.params.id;
+    Person.findByIdAndDelete(id).then(result => {
+        if (result) {
+            response.status(204).end() // delete successfully
+        } else {
+            res.status(404).json({ error: 'person not found' })
+        }
+    }).catch(error => next(error))
+})
 
 // app.get('/api/info', (request, response) => {
 //     const time = new Date();
@@ -85,6 +85,12 @@ app.post('/api/persons', (request, response) => {
         response.status(500).json({ error: 'server error' })
     })
 })
+
+//when call next(err) , this code down below will be executed
+app.use((error, req, res, next) => {
+    console.error('Error message:', error.message); // 日志
+    res.status(500).json({ error: error.message }); // 返回 JSON 错误
+});
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
