@@ -18,7 +18,7 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 
 app.get('/api/info', (request, response) => {
     const time = new Date();
-    response.send(`Phonebook has info for ${persons.length} people<br>${time}`)
+    response.send("THIS IS YOUR PHONEBOOK")
 })
 
 // get all persons
@@ -82,6 +82,21 @@ app.post('/api/persons', (request, response) => {
             response.json(result)  // 响应客户端
             // 注意：不要在这里关闭连接,不是每次请求完成后都要关数据库
         }
+    }).catch(error => next(error))
+})
+
+// update phonebook entry for a person whose name is already in the phonebook
+app.put('/api/persons/:id', (request, response) => {
+    Person.findById(request.params.id).then(person => {
+        if (!person) {
+            return response.status(404).end()
+        }
+        person.name = request.body.name
+        person.number = request.body.number
+        return person.save()
+    }).then(updatedPerson => {
+        console.log(updatedPerson)
+        response.json(updatedPerson)
     }).catch(error => next(error))
 })
 
