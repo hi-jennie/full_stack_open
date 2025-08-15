@@ -16,6 +16,10 @@ morgan.token('body', (request) => {
 // the  parameter in morgan defines the format of the log
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
+app.get('/api/info', (request, response) => {
+    const time = new Date();
+    response.send(`Phonebook has info for ${persons.length} people<br>${time}`)
+})
 
 // get all persons
 app.get('/api/persons', (request, response) => {
@@ -25,10 +29,10 @@ app.get('/api/persons', (request, response) => {
 })
 
 //  get single person through id
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
     Person.findById(request.params.id).then(person => {
         response.json(person)
-    })
+    }).then(error => next(error))
 })
 
 // delete person through id
@@ -43,15 +47,13 @@ app.delete('/api/persons/:id', (request, response, next) => {
     }).catch(error => next(error))
 })
 
-// app.get('/api/info', (request, response) => {
-//     const time = new Date();
-//     response.send(`Phonebook has info for ${persons.length} people<br>${time}`)
-// })
+
 
 // const generatedId = () => {
 //     const maxId = persons.length > 0 ? Math.max(...persons.map(p => Number(p.id))) : 0
 //     return String(maxId + 1);
 // }
+
 app.post('/api/persons', (request, response) => {
     const body = request.body
     if (!body.name) {
@@ -80,10 +82,7 @@ app.post('/api/persons', (request, response) => {
             response.json(result)  // 响应客户端
             // 注意：不要在这里关闭连接,不是每次请求完成后都要关数据库
         }
-    }).catch(error => {
-        console.error(error)
-        response.status(500).json({ error: 'server error' })
-    })
+    }).catch(error => next(error))
 })
 
 //when call next(err) , this code down below will be executed
