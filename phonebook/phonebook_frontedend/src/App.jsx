@@ -25,7 +25,7 @@ const App = () => {
     );
     if (existPerson) {
       const confirmReplacement = window.confirm(
-        `${newName} is already added to phonebook`
+        `${newName} is already added to phonebook, do you want to replace the old number with a new one?`
       );
       if (confirmReplacement) {
         phonebookService
@@ -76,11 +76,24 @@ const App = () => {
           setNewNumber("");
         })
         .catch((error) => {
-          console.error("Error adding person:", error);
-          setMessage({
-            type: "error",
-            content: "Error adding person. Please try again.",
-          });
+          if (
+            error.response &&
+            error.response.data &&
+            error.response.data.error
+          ) {
+            console.log(error.response.data.error);
+            setMessage({
+              type: "error",
+              content: error.response.data.error,
+            });
+          } else {
+            console.error("Unknown error:", error.message || error);
+            setMessage({
+              type: "error",
+              content: "Error adding person. Please try again.",
+            });
+          }
+
           setTimeout(() => {
             setMessage(null);
           }, 5000);
@@ -126,6 +139,7 @@ const App = () => {
       .getAll()
       .then((initialData) => {
         setPersons(initialData);
+        console.log("!!!!", initialData);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);

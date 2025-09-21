@@ -54,29 +54,13 @@ app.delete('/api/persons/:id', (request, response, next) => {
 //     return String(maxId + 1);
 // }
 
-app.post('/api/persons', (request, response) => {
-    const body = request.body
-    if (!body.name) {
-        return response.status(400).json({ error: 'name is missing' })
-    }
-
-    if (!body.number) {
-        return response.status(400).json({ error: 'number is missing' })
-    }
-    Person.find({}).then(people => {
-        const existingPerson = people.find(p => p.name.toUpperCase() === body.name.toUpperCase())
-        if (existingPerson) {
-            return response.status(400).json({
-                error: 'name already existing'
-            })
-        }
-
-        const newPerson = new Person({
-            name: body.name,
-            number: body.number
-        })
-        return newPerson.save()// 这里加return，继续链式调用
-    }).then(result => {
+app.post('/api/persons', (request, response, next) => {
+    const { name, number } = request.body
+    const newPerson = new Person({
+        name: name,
+        number: number
+    })
+    newPerson.save().then(result => {
         if (result) {
             console.log(`added ${result.name} number ${result.number} to phonebook`)
             response.json(result)  // 响应客户端
@@ -86,7 +70,7 @@ app.post('/api/persons', (request, response) => {
 })
 
 // update phonebook entry for a person whose name is already in the phonebook
-app.put('/api/persons/:id', (request, response) => {
+app.put('/api/persons/:id', (request, response, next) => {
     Person.findById(request.params.id).then(person => {
         if (!person) {
             return response.status(404).end()
@@ -101,9 +85,16 @@ app.put('/api/persons/:id', (request, response) => {
 })
 
 //when call next(err) , this code down below will be executed
+// In Express, any middleware with 4 parameters (error, req, res, next) is recognized as an error-handling middleware.
+// CastError usually happens in Mongoose when you try to query MongoDB with an invalid ObjectId (e.g., 123abc).
+// ValidationError is a Mongoose error when saving a document fails validation (e.g., required field missing, string doesn’t match a pattern, etc.).
 app.use((error, req, res, next) => {
-    console.error('Error message:', error.message); // 日志
-    res.status(500).json({ error: error.message }); // 返回 JSON 错误
+    console.error(1 + error.message)
+    if (error.name === 'CastError') {
+        return res.status(400).send({ error: 'malformatted id' })
+    } else if (error.name === 'ValidationError') {
+        return res.status(400).json({ error: error.message })
+    }
 });
 
 const PORT = process.env.PORT || 3001

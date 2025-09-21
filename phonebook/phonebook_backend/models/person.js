@@ -22,9 +22,25 @@ mongoose.connect(url).then(result => {
         console.log('error connecting to MongoDB:', error.message)
     })
 
+// validation functionality available in Mongoose.
+// validation rules 
 const personSchema = new mongoose.Schema({
-    name: String,
-    number: String
+    name: {
+        type: String,
+        required: true,
+        minLength: 3            // at least 3
+    },
+    number: {
+        type: String,
+        required: true,
+        validate: {
+            validator: function (v) {
+                // 正则：2~3位数字 + '-' + 6或更多数字（确保长度至少8）
+                return /^\d{2,3}-\d{6,}$/.test(v);
+            },
+            message: props => `${props.value} is not a valid phone number!`
+        }
+    }
 })
 
 personSchema.set('toJSON', {
