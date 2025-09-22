@@ -25,4 +25,7 @@ export default [
       '@stylistic/js/semi': ['error', 'never'],
     },
   },
+  {
+    ignores: ['dist/**'],
+  }
 ]
