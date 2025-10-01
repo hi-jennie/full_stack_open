@@ -5,8 +5,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "node --test",
-    "lint": "eslint ."
+    "test": "node --test"
   },
   "keywords": [],
   "author": "",
@@ -17,7 +16,6 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
-    "lodash": "^4.17.21",
     "mongoose": "^8.18.2"
   }
 }
