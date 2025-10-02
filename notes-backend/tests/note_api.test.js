@@ -12,12 +12,19 @@ const api = supertest(app);
 beforeEach(async () => {
   await Note.deleteMany({});
 
-  let noteObject = new Note(helper.initialNotes[0]);
-  await noteObject.save();
-
-  noteObject = new Note(helper.initialNotes[1]);
-  await noteObject.save();
+  const noteObjects = helper.initialNotes.map((note) => new Note(note));
+  // note.save() returns a promise, map method will collect all those promises into an array
+  const promiseArray = noteObjects.map((note) => note.save());
+  // await for all those promises to resolve
+  await Promise.all(promiseArray);
 });
+
+// The easiest way to handle the situation is by utilizing Mongoose's built-in method insertMany:
+
+// beforeEach(async () => {
+//   await Note.deleteMany({});
+//   await Note.insertMany(helper.initialNotes);
+// });
 
 test('notes are returned as json', async () => {
   await api
