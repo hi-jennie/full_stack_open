@@ -70,6 +70,39 @@ test('note without content is not added', async () => {
   assert.strictEqual(notesAtEnd.length, helper.initialNotes.length);
 });
 
+// viewing a specific note
+test('a specific note can be viewed', async () => {
+  // get all notes from the database
+  const notesAtStart = await helper.notesInDb();
+  // pick the first note
+  const noteToView = notesAtStart[0];
+
+  // make an api call to get that specific note
+  const resultNote = await api
+    .get(`/api/notes/${noteToView.id}`)
+    .expect(200)
+    .expect('Content-Type', /application\/json/);
+
+  assert.deepStrictEqual(resultNote.body, noteToView);
+});
+
+// delete a note
+test('a note can be deleted', async () => {
+  const notesAtStart = await helper.notesInDb();
+  const noteToDelete = notesAtStart[0];
+
+  await api.delete(`/api/notes/${noteToDelete.id}`).expect(204);
+
+  const notesAtEnd = await helper.notesInDb();
+
+  const contents = notesAtEnd.map((n) => n.content);
+  assert(!contents.includes(noteToDelete.content));
+
+  // 测试应该基于「预期初始状态」去断言，而不是依赖「测试运行时的临时状态」。
+  // this is why we should use helper.initialNotes.length but not notesAtStart.length
+  assert.strictEqual(notesAtEnd.length, helper.initialNotes.length - 1);
+});
+
 after(async () => {
   await mongoose.connection.close();
 });
