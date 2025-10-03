@@ -115,6 +115,29 @@ test('delete a blog by id', async () => {
   assert.strictEqual(blogsAtEnd.length, testHelper.initialBlogs.length - 1);
 });
 
+test('update a blog by id', async () => {
+  const blogsAtFirst = await testHelper.blogsInDb();
+  const blogToUpdate = blogsAtFirst[0];
+
+  const updatedBlogData = {
+    ...blogToUpdate,
+    likes: blogToUpdate.likes + 1,
+  };
+
+  await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send(updatedBlogData)
+    .expect(200);
+
+  // check the total number of blogs remains the same
+  const blogsAtEnd = await testHelper.blogsInDb();
+  assert.strictEqual(blogsAtEnd.length, blogsAtFirst.length);
+
+  // check that likes have increased by 1
+  const updatedBlog = blogsAtEnd.find((b) => b.id === blogToUpdate.id);
+  assert.strictEqual(updatedBlog.likes, blogToUpdate.likes + 1);
+});
+
 after(() => {
   mongoose.connection.close();
 });
