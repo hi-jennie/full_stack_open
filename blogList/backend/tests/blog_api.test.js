@@ -103,6 +103,18 @@ test('blog without url fields is not added', async () => {
   assert.strictEqual(blogsAtEnd.length, testHelper.initialBlogs.length);
 });
 
+test('delete a blog by id', async () => {
+  const blogsAtFirst = await testHelper.blogsInDb();
+  const blogToDelete = blogsAtFirst[0];
+
+  await api.delete(`/api/blogs/${blogToDelete.id}`);
+
+  const blogsAtEnd = await testHelper.blogsInDb();
+  const titles = blogsAtEnd.map((blog) => blog.title);
+  assert(!titles.includes(blogToDelete.title));
+  assert.strictEqual(blogsAtEnd.length, testHelper.initialBlogs.length - 1);
+});
+
 after(() => {
   mongoose.connection.close();
 });
