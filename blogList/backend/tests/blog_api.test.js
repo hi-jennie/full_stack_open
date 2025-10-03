@@ -27,3 +27,52 @@ test('return all blogs', async () => {
   console.log('actual returnedBlogs', response.body);
   assert.strictEqual(response.body.length, testHelper.initialBlogs.length);
 });
+
+test('blog has id property instead of _id', async () => {
+  const response = await api.get('/api/blogs');
+  const blogs = response.body;
+  blogs.forEach((blog) => {
+    assert.ok(blog.id);
+    assert.strictEqual(blog._id, undefined);
+  });
+});
+
+test('a valid blog can be added', async () => {
+  const newBlog = {
+    title: 'New Blog',
+    author: 'John Doe',
+    url: 'https://example.com/new-blog',
+    likes: 2,
+  };
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/);
+
+  const blogsAtEnd = await testHelper.blogsInDb();
+  assert.strictEqual(blogsAtEnd.length, testHelper.initialBlogs.length + 1);
+
+  const titles = blogsAtEnd.map((blog) => blog.title);
+  const urls = blogsAtEnd.map((blog) => blog.url);
+  assert(titles.includes('New Blog'));
+  assert(urls.includes('https://example.com/new-blog'));
+});
+
+test('blog without correct fields is not added', async () => {
+  const newBlog = {
+    author: 'John Doe',
+    url: 'https://example.com/new-blog',
+    likes: 2,
+  };
+
+  await api.post('/api/blogs').send(newBlog).expect(400);
+
+  const blogsAtEnd = await testHelper.blogsInDb();
+  assert.strictEqual(blogsAtEnd.length, testHelper.initialBlogs.length);
+});
+
+after(() => {
+  mongoose.connection.close();
+});

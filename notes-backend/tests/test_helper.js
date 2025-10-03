@@ -24,6 +24,8 @@ const nonExistingId = async () => {
 };
 
 const notesInDb = async () => {
+  // Note.find({}) 返回的是数组，数组元素是 Mongoose 文档对象（带 _id、__v 等）。
+  // that why we need to map them to JSON objects
   const notes = await Note.find({});
   return notes.map((note) => note.toJSON());
 };
