@@ -24,7 +24,6 @@ test('blogs are returned in json format', async () => {
 
 test('return all blogs', async () => {
   const response = await api.get('/api/blogs');
-  console.log('actual returnedBlogs', response.body);
   assert.strictEqual(response.body.length, testHelper.initialBlogs.length);
 });
 
@@ -60,10 +59,41 @@ test('a valid blog can be added', async () => {
   assert(urls.includes('https://example.com/new-blog'));
 });
 
-test('blog without correct fields is not added', async () => {
+test('blog without likes defaults to 0', async () => {
+  const newBlog = {
+    title: 'New Blog1',
+    author: 'John Doe',
+    url: 'https://example.com/new-blog',
+  };
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/);
+
+  const blogsAtEnd = await testHelper.blogsInDb();
+  const addedBlog = blogsAtEnd.find((blog) => blog.title === 'New Blog1');
+  assert.strictEqual(addedBlog.likes, 0);
+});
+
+test('blog without title fields is not added', async () => {
   const newBlog = {
     author: 'John Doe',
     url: 'https://example.com/new-blog',
+    likes: 2,
+  };
+
+  await api.post('/api/blogs').send(newBlog).expect(400);
+
+  const blogsAtEnd = await testHelper.blogsInDb();
+  assert.strictEqual(blogsAtEnd.length, testHelper.initialBlogs.length);
+});
+
+test('blog without url fields is not added', async () => {
+  const newBlog = {
+    title: 'New Blog',
+    author: 'John Doe',
     likes: 2,
   };
 
